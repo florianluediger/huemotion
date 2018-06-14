@@ -21,8 +21,10 @@ public class ConfigManager {
                 e.printStackTrace();
             }
         } else {
-            properties.put("user", "");
-            properties.put("password", "");
+            properties.put("SpeechToTextUser", "");
+            properties.put("SpeechToTextPassword", "");
+            properties.put("ToneAnalyzerUser", "");
+            properties.put("ToneAnalyzerPassword", "");
             try {
                 properties.store(new FileOutputStream(filePath), null);
             } catch (IOException e) {
@@ -31,12 +33,20 @@ public class ConfigManager {
         }
     }
 
-    public String getUser() {
-        return properties.getProperty("user");
+    public String getSpeechToTextUser() {
+        return properties.getProperty("SpeechToTextUser");
     }
 
-    public String getPassword() {
-        return properties.getProperty("password");
+    public String getSpeechToTextPassword() {
+        return properties.getProperty("SpeechToTextPassword");
+    }
+
+    public String getToneAnalyzerUser() {
+        return properties.getProperty("ToneAnalyzerUser");
+    }
+
+    public String getToneAnalyzerPassword() {
+        return properties.getProperty("ToneAnalyzerPassword");
     }
 
 }
