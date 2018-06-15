@@ -13,7 +13,7 @@ fun getText(user: String, password: String): String {
     val fileName = "Recording.wav"
 
     val recorder = Recorder()
-    recorder.record(10, "Recording.wav")
+    recorder.record(10, fileName)
 
     Authenticator.setDefault(object : Authenticator() {
         override fun getPasswordAuthentication(): PasswordAuthentication {
