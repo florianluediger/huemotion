@@ -4,7 +4,7 @@ import java.io.File
 import java.io.IOException
 import javax.sound.sampled.*
 
-class Recorder {
+object Recorder {
 
     private val format = AudioFormat(32000f, 16, 1, true, true)
 

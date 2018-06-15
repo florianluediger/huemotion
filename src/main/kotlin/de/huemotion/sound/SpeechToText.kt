@@ -1,35 +1,27 @@
 package de.huemotion.sound
 
-import org.apache.commons.io.IOUtils
+import com.ibm.watson.developer_cloud.speech_to_text.v1.SpeechToText
+import com.ibm.watson.developer_cloud.speech_to_text.v1.model.RecognizeOptions
+import de.huemotion.ConfigManager
 import org.json.JSONObject
-import java.net.Authenticator
-import java.net.HttpURLConnection
-import java.net.PasswordAuthentication
-import java.net.URL
-import java.nio.file.Files
-import java.nio.file.Paths
+import java.io.FileInputStream
 
-fun getText(user: String, password: String): String {
+
+fun getText(): String {
     val fileName = "Recording.wav"
 
-    val recorder = Recorder()
-    recorder.record(10, fileName)
+    Recorder.record(10, fileName)
 
-    Authenticator.setDefault(object : Authenticator() {
-        override fun getPasswordAuthentication(): PasswordAuthentication {
-            return PasswordAuthentication(user, password.toCharArray())
-        }
-    })
+    val speechToText = SpeechToText(ConfigManager.speechToTextUser, ConfigManager.speechToTextPassword)
 
-    val url = URL("https://stream.watsonplatform.net/speech-to-text/api/v1/recognize")
-    val connection = url.openConnection() as HttpURLConnection
-    connection.doOutput = true
-    connection.requestMethod = "POST"
-    connection.setRequestProperty("Content-Type", "audio/wav")
+    val recognizeOptions = RecognizeOptions.Builder()
+            .audio(FileInputStream(fileName))
+            .contentType("audio/wav")
+            .build()
 
-    val path = Paths.get(fileName)
-    connection.outputStream.write(Files.readAllBytes(path))
-    val result = IOUtils.toString(connection.inputStream)
+
+    val result = speechToText.recognize(recognizeOptions).execute().toString()
+
     return parseJSONResponse(result)
 }
 
