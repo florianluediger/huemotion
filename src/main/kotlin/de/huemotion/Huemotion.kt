@@ -5,8 +5,11 @@ import de.huemotion.tone.getTone
 
 
 fun main(args: Array<String>) {
-    val text = getText()
-    println("Text: $text")
-    val result = getTone(text)
-    println(result)
+    while (true) {
+        val text = getText()
+        println("Text: $text")
+        val result = getTone(text)
+        println(result)
+        println(emotionColorMap[result])
+    }
 }
