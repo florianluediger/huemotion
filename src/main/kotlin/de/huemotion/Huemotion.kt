@@ -1,12 +1,24 @@
 package de.huemotion
 
-import de.huemotion.sound.getText
-import de.huemotion.tone.getTone
+import com.philips.lighting.hue.sdk.PHHueSDK
+import de.huemotion.light.Controller
+import de.huemotion.light.HueProperties
 
 
 fun main(args: Array<String>) {
-    val text = getText()
-    println("Text: $text")
-    val result = getTone(text)
-    println(result)
+    val hueSDK = PHHueSDK.create()
+    HueProperties.loadProperties()
+    val controller = Controller()
+    if (!controller.connectToLastKnownAccessPoint()) {
+        // Initialize
+        controller.findBridges()
+        println("Please add the id of a lamp to MyHue.properties")
+        return
+    }
+    hueSDK.getNotificationManager().registerSDKListener(controller.listener);
+
+    //val text = getText()
+    //println("Text: $text")
+    //val result = getTone(text)
+    //println(result)
 }
