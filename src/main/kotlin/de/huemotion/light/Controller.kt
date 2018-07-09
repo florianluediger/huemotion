@@ -6,6 +6,7 @@ import com.philips.lighting.model.PHBridge
 import com.philips.lighting.model.PHHueError
 import com.philips.lighting.model.PHHueParsingError
 import com.philips.lighting.model.PHLightState
+import de.huemotion.onLightsReady
 import java.util.*
 
 class Controller {
@@ -25,16 +26,14 @@ class Controller {
                 println("Connecting to " + accessPoint.ipAddress)
                 val hueSDK = PHHueSDK.getInstance()
                 hueSDK.connect(accessPoint)
-                println("Please push the button on your bridge")
                 hueSDK.startPushlinkAuthentication(accessPoint)
                 return
             }
-
         }
 
         override fun onAuthenticationRequired(accessPoint: PHAccessPoint) {
             phHueSDK!!.startPushlinkAuthentication(accessPoint)
-
+            println("Please push the button on your bridge")
         }
 
         override fun onBridgeConnected(bridge: PHBridge, username: String) {
@@ -44,25 +43,10 @@ class Controller {
             HueProperties.storeUsername(username)
             HueProperties.storeLastIPAddress(lastIpAddress)
             HueProperties.saveProperties()
-            println("Connected successfully")
 
-            val lights = bridge.getResourceCache().getAllLights()
-            for (light in lights) {
-                println(light.name + ":     " + light.identifier)
-            }
-            changeLightOf("11")
+            println("Connected")
+            onLightsReady()
         }
-
-        fun changeLightOf(identifier: String) {
-            val hueSDK = PHHueSDK.getInstance()
-            val lightState = PHLightState()
-            val xy = PHUtilities.calculateXYFromRGB(120, 120, 220, "LCT001")
-            lightState.x = xy[0]
-            lightState.y = xy[1]
-            lightState.setOn(true)
-            hueSDK.getSelectedBridge().updateLightState(identifier, lightState, null)
-        }
-
 
         override fun onCacheUpdated(arg0: List<Int>, arg1: PHBridge) {}
 
@@ -73,10 +57,12 @@ class Controller {
         override fun onError(code: Int, message: String) {
 
             if (code == PHHueError.BRIDGE_NOT_RESPONDING) {
-
+                println(message)
             } else if (code == PHMessageType.PUSHLINK_BUTTON_NOT_PRESSED) {
             } else if (code == PHMessageType.PUSHLINK_AUTHENTICATION_FAILED) {
+                println(message)
             } else if (code == PHMessageType.BRIDGE_NOT_FOUND) {
+                println(message)
             }
         }
 
@@ -112,6 +98,24 @@ class Controller {
         }
     }
 
+    fun listLights() {
+        val lights = phHueSDK!!.selectedBridge.getResourceCache().getAllLights()
+        for (light in lights) {
+            println(light.name + ":     " + light.identifier)
+        }
+        changeLightOf("11")
+    }
+
+    fun changeLightOf(identifier: String) {
+        val hueSDK = PHHueSDK.getInstance()
+        val lightState = PHLightState()
+        val xy = PHUtilities.calculateXYFromRGB(120, 120, 220, "LCT001")
+        lightState.x = xy[0]
+        lightState.y = xy[1]
+        lightState.setOn(true)
+        hueSDK.getSelectedBridge().updateLightState(identifier, lightState, null)
+    }
+
     /**
      * Connect to the last known access point.
      * This method is triggered by the Connect to Bridge button but it can equally be used to automatically connect to a bridge.
@@ -121,7 +125,7 @@ class Controller {
         val username = HueProperties.getUsername()
         val lastIpAddress = HueProperties.getLastConnectedIP()
 
-        if (username == "" || lastIpAddress == "") {
+        if (username == "" || lastIpAddress == "" || username == null || lastIpAddress == null) {
             println("Missing Last Username or Last IP.  Last known connection not found.")
             return false
         }

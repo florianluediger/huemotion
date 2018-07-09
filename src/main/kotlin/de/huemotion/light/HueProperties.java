@@ -6,28 +6,26 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-import com.philips.lighting.hue.sdk.connection.impl.PHBridgeInternal;
-
 /**
  * HueProperties.java
- * 
+ * <p>
  * Stores the last known connected IP Address and the last known username.
- * This facilitates automatic bridge connection. 
- *  
- * Also, as the username (for the whitelist) is a random string,  this prevents the need to 
+ * This facilitates automatic bridge connection.
+ * <p>
+ * Also, as the username (for the whitelist) is a random string,  this prevents the need to
  * pushlink every time the app is started (as the username is read from the properties file).
- *
  */
 public final class HueProperties {
 
-    private static final String LAST_CONNECTED_IP   = "LastIPAddress";
-    private static final String USER_NAME           = "WhiteListUsername";
-    private static final String PROPS_FILE_NAME     = "MyHue.properties";
-    private static Properties props=null;
+    private static final String LAST_CONNECTED_IP = "LastIPAddress";
+    private static final String USER_NAME = "WhiteListUsername";
+    private static final String LIGHT_ID = "LightID";
+    private static final String PROPS_FILE_NAME = "MyHue.properties";
+    private static Properties props = null;
 
     private HueProperties() {
     }
-    
+
     public static void storeLastIPAddress(String ipAddress) {
         props.setProperty(LAST_CONNECTED_IP, ipAddress);
         saveProperties();
@@ -41,23 +39,32 @@ public final class HueProperties {
         saveProperties();
     }
 
+    public static void storeLightID(String lightID) {
+        props.setProperty(LIGHT_ID, lightID);
+        saveProperties();
+    }
+
     /**
      * Returns the stored Whitelist username.  If it doesn't exist we generate a 16 character random string and store this in the properties file.
      */
     public static String getUsername() {
-        String username = props.getProperty(USER_NAME);        
+        String username = props.getProperty(USER_NAME);
         return username;
     }
 
     public static String getLastConnectedIP() {
         return props.getProperty(LAST_CONNECTED_IP);
     }
-    
+
+    public static String getLightID() {
+        return props.getProperty(LIGHT_ID);
+    }
+
     public static void loadProperties() {
-        if (props==null) {
-            props=new Properties();
+        if (props == null) {
+            props = new Properties();
             FileInputStream in;
-            
+
             try {
                 in = new FileInputStream(PROPS_FILE_NAME);
                 props.load(in);
@@ -80,6 +87,6 @@ public final class HueProperties {
         } catch (IOException e) {
             // Handle the IOException.
         }
-    } 
+    }
 
 }
