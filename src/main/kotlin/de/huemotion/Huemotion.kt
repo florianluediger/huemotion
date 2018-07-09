@@ -30,9 +30,14 @@ fun onLightsReady() {
         controller.listLights()
         System.exit(0)
     }
-    //val text = getText()
-    //println("Text: $text")
-    //val result = getTone(text)
-    //println(result)
-    controller.changeLightOf(lightID)
+    println("Selected light is flashing")
+    controller.flash(lightID)
+
+    while (true) {
+        val text = getText()
+        println("Text: $text")
+        val result = getTone(text)
+        println(result)
+        controller.changeLightOf(lightID, emotionColorMap[result]!!)
+    }
 }

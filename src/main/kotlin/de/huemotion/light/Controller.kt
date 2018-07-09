@@ -1,7 +1,6 @@
 package de.huemotion.light
 
 import com.philips.lighting.hue.sdk.*
-import com.philips.lighting.hue.sdk.utilities.PHUtilities
 import com.philips.lighting.model.PHBridge
 import com.philips.lighting.model.PHHueError
 import com.philips.lighting.model.PHHueParsingError
@@ -103,17 +102,29 @@ class Controller {
         for (light in lights) {
             println(light.name + ":     " + light.identifier)
         }
-        changeLightOf("11")
     }
 
-    fun changeLightOf(identifier: String) {
-        val hueSDK = PHHueSDK.getInstance()
+    fun changeLightOf(identifier: String, color: FloatArray) {
         val lightState = PHLightState()
-        val xy = PHUtilities.calculateXYFromRGB(120, 120, 220, "LCT001")
-        lightState.x = xy[0]
-        lightState.y = xy[1]
-        lightState.setOn(true)
-        hueSDK.getSelectedBridge().updateLightState(identifier, lightState, null)
+        lightState.x = color[0]
+        lightState.y = color[1]
+        lightState.isOn = true
+        phHueSDK!!.getSelectedBridge().updateLightState(identifier, lightState, null)
+    }
+
+    fun flash(identifier: String) {
+        val lightState = PHLightState()
+        lightState.isOn = true
+        phHueSDK!!.selectedBridge.updateLightState(identifier, lightState, null)
+        Thread.sleep(500)
+        lightState.isOn = false
+        phHueSDK!!.selectedBridge.updateLightState(identifier, lightState, null)
+        Thread.sleep(500)
+        lightState.isOn = true
+        phHueSDK!!.selectedBridge.updateLightState(identifier, lightState, null)
+        Thread.sleep(500)
+        lightState.isOn = false
+        phHueSDK!!.selectedBridge.updateLightState(identifier, lightState, null)
     }
 
     /**
